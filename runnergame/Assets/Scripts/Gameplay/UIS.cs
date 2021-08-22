@@ -10,14 +10,19 @@ public class UIS : MonoBehaviour
 
     [SerializeField] Button settingBtn;
     [SerializeField] TMP_Text coinT;
+    public Image touctAreaImg;
+
     int coinTemp = 0;
-    // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
         }
+    }
+    // Start is called before the first frame update
+    void Start()
+    {
         settingBtn.onClick.AddListener(ClickSetting);
     }
 
@@ -34,6 +39,9 @@ public class UIS : MonoBehaviour
     #region click
     private void ClickSetting()
     {
+        //sound
+        SoundS.Instance.PlaySfx(0);
+
         GameM.Instance.ShowSetting(true);
     }
     #endregion

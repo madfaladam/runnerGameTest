@@ -8,6 +8,8 @@ TagManager:
   - coin
   - obstacle
   - powerup
+  - Missile
+  - triggerStart
   layers:
   - Default
   - TransparentFX
@@ -47,4 +49,7 @@ TagManager:
     locked: 0
   - name: obj
     uniqueID: 2335333623
+    locked: 0
+  - name: fx
+    uniqueID: 2026984117
     locked: 0

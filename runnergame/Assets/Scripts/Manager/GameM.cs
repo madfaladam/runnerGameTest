@@ -3,19 +3,32 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Cinemachine;
+using DG.Tweening;
 
 public class GameM : MonoBehaviour
 {
     public static GameM Instance;
 
-    [Header("canvas")]
+    [Header("[ cam ]")]
+    [SerializeField] CinemachineVirtualCamera vcam;
+    [Header("[ canvas ]")]
+    [SerializeField] GameObject htpCanvas;
     [SerializeField] GameObject settingCanvas;
     [SerializeField] GameObject resultCanvas;
-    [Header("var")]
+    [Header("[ obj ]")]
+    [SerializeField] PoolItemObsS poolItemObs;
+    [Header("[ var ]")]
+    public float moveSpeed = 5f;
+    [SerializeField] float nextSpeed = 0;
+    [Space]
     public int totCoin = 0;
+    public bool isStart = false;
     public bool isPause = false;
     public bool isEnd = false;
-    [Header("parallax bg")]
+    [Space]
+    [SerializeField] int distance = 0;
+    [Header("[ parallax bg ]")]
     [SerializeField] Transform groundCont;
     [SerializeField] Transform bg0Cont;
     [SerializeField] Transform bg1Cont;
@@ -26,13 +39,45 @@ public class GameM : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-        }    
+        }
+
+        nextSpeed = moveSpeed + 1;
+
+        //set #1 item & obs
+        poolItemObs.CreateItemObs();
+        GetItemObstacles(groundCont.GetChild(1));
+
+        //check tut
+        if (GlobalVarS.Instance.isNewPlayer)
+        {
+            GlobalVarS.Instance.isNewPlayer = false;
+            ShowHowToPlay(true);
+        }
+
+        //bgm
+        SoundS.Instance.StopBgm(0);
+        SoundS.Instance.PlayBgm(1);
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (isPause || isEnd)
+        {
+            return;
+        }
+        checkSpeedLevel();
         checkParallaxBg();
+    }
+
+    private void checkSpeedLevel()
+    {
+        distance ++;
+        if (Mathf.Round(distance) % 20 == 0 && moveSpeed < nextSpeed)
+        {
+            moveSpeed++;
+            nextSpeed++;
+        }
     }
 
     private void checkParallaxBg()
@@ -43,9 +88,17 @@ public class GameM : MonoBehaviour
             if (groundCont.GetChild(i).GetChild(1).transform.position.x < Camera.main.transform.position.x-12f)
             {
                 //Debug.Log(groundCont.GetChild(i).GetChild(1).transform.position.x + " " + Camera.main.transform.position.x);
+                Transform groundTrans = groundCont.GetChild(i);
+                //check if any items in child
+                if (groundTrans.childCount > 2)
+                {
+                    poolItemObs.BackItemObsToPool(groundTrans.GetChild(groundTrans.childCount - 1).gameObject);
+                }
+                groundTrans.transform.position = new Vector3(groundCont.GetChild(i + 1).GetChild(1).transform.position.x, groundTrans.transform.position.y, groundTrans.transform.position.z);
+                groundTrans.SetAsLastSibling();
 
-                groundCont.GetChild(i).transform.position = new Vector3(groundCont.GetChild(i + 1).GetChild(1).transform.position.x, groundCont.GetChild(i).transform.position.y, groundCont.GetChild(i).transform.position.z);
-                groundCont.GetChild(i).SetAsLastSibling();
+                //getitem & obs
+                GetItemObstacles(groundTrans);
             }
         }
 
@@ -73,7 +126,27 @@ public class GameM : MonoBehaviour
         }
     }
 
+    private void GetItemObstacles(Transform groundTrans)
+    {
+        Transform itemObs = poolItemObs.GetItemObs().transform;
+        itemObs.SetParent(groundTrans);
+        itemObs.localPosition = Vector3.zero;
+    }
+
+    public void CameraShake()
+    {
+        CinemachineBasicMultiChannelPerlin cinemachineBasicMultiChannelPerlin = vcam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
+        cinemachineBasicMultiChannelPerlin.m_AmplitudeGain = 1f;
+        DOTween.To(() => cinemachineBasicMultiChannelPerlin.m_AmplitudeGain, x => cinemachineBasicMultiChannelPerlin.m_AmplitudeGain = x, 0f, 1f);
+
+    }
+
     #region menu event
+    public void ShowHowToPlay(bool v)
+    {
+        htpCanvas.SetActive(v);
+        isPause = v;
+    }
     public void ShowSetting(bool v)
     {
         settingCanvas.SetActive(v);

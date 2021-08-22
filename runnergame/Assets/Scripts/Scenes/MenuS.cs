@@ -15,6 +15,9 @@ public class MenuS : MonoBehaviour
     #region Click
     private void ClickPlay()
     {
+        //sound
+        SoundS.Instance.PlaySfx(0);
+
         MenuM.Instance.GotoGame();
     }
     #endregion

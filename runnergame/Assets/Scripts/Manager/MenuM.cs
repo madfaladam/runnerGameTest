@@ -13,7 +13,11 @@ public class MenuM : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-        }  
+        }
+
+        //bgm
+        SoundS.Instance.StopBgm(1);
+        SoundS.Instance.PlayBgm(0);
     }
 
     #region menu event

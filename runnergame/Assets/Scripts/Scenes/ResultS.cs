@@ -25,6 +25,7 @@ public class ResultS : MonoBehaviour
         int coinTemp = 0;
 
         DOTween.To(() => coinTemp, x => coinTemp = x, GameM.Instance.totCoin, 1f).SetDelay(0.5f).OnUpdate(()=>updateCoin(coinTemp)).OnComplete(FinishAnimCount);
+        coinT.transform.parent.DOScale(1.2f, 0.25f).SetDelay(0.5f).SetLoops(2, LoopType.Yoyo);
     }
 
     private void updateCoin(int x)
@@ -43,11 +44,17 @@ public class ResultS : MonoBehaviour
     #region Click
     private void ClickReplay()
     {
+        //sound
+        SoundS.Instance.PlaySfx(0);
+
         GameM.Instance.ReplayGame();
     }
 
     private void ClickHome()
     {
+        //sound
+        SoundS.Instance.PlaySfx(0);
+
         GameM.Instance.BackToMenu();
     }
     #endregion

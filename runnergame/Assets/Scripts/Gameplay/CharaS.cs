@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using DG.Tweening;
 
 public enum CharStatus
 {
@@ -11,31 +13,78 @@ public enum CharStatus
 public class CharaS : MonoBehaviour
 {
     [SerializeField] CharStatus status;
-    public Collider2D[] coll2d;
+
+    [HideInInspector] CapsuleCollider2D coll2d;
     [HideInInspector] public Animator anim;
     [HideInInspector] public Rigidbody2D rb;
+    [HideInInspector] public Transform graph;
 
-    [Header("move")]
+    [Header("[ move ]")]
     [SerializeField] Transform groundCheck;
     [SerializeField] private LayerMask groundLayerMask;
     public bool isGrounded;
     public bool isSlide = false;
-    [SerializeField] float moveSpeed = 5f;
     Vector3 m_Velocity = Vector3.zero;
     float movementX = 1f;
+
+    public delegate void DoJumpDelegate();
+    public DoJumpDelegate Dojump;
+    public delegate void DoSlideDelegate();
+    public DoSlideDelegate DoSlide;
+
+    [Header("[ sfx ]")]
+    [SerializeField] AudioSource hitSfx;
+    [Header("[ fx ]")]
+    [SerializeField] ParticleSystem dizzyFx;
+    [SerializeField] ParticleSystem hitFx;
 
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        graph = transform.GetChild(0);
+        coll2d = GetComponent<CapsuleCollider2D>();
+
+        //controller
+        EventTrigger trigger = UIS.Instance.touctAreaImg.GetComponent<EventTrigger>();
+        EventTrigger.Entry entry = new EventTrigger.Entry();
+        entry.eventID = EventTriggerType.EndDrag;
+        entry.callback.AddListener((data) => { OnEndDragDelegate((PointerEventData)data); });
+        trigger.triggers.Add(entry);
+    }
+
+    public void changeCollSize(int i)
+    {
+        if (i == 0)
+        {
+            coll2d.offset = Vector2.zero;
+            coll2d.size = new Vector2(0.92f, 1.85f);
+        }
+        else
+        {
+            coll2d.offset = new Vector2(0f, -0.32f);
+            coll2d.size = new Vector2(1.1f, 1.2f);
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("obstacle"))
+        if (GameM.Instance.isEnd)
         {
+            return;
+        }
+        if (other.gameObject.CompareTag("triggerStart"))
+        {
+            GameM.Instance.isStart = true;
+        }
+        else if (other.gameObject.CompareTag("obstacle"))
+        {
+            //sound
+            hitSfx.Play();
+
             Debug.Log("getHit by " + other.gameObject.name);
+
             if (status == CharStatus.FIT)
             {
                 status = CharStatus.DIZZY;
@@ -47,9 +96,15 @@ public class CharaS : MonoBehaviour
                 status = CharStatus.DIE;
                 StartCoroutine(TimerDie());
             }
+            other.gameObject.SetActive(false);
+            GameM.Instance.CameraShake();
         }
         else if (other.gameObject.CompareTag("coin"))
         {
+            //fx
+            hitFx.time = 0f;
+            hitFx.Play();
+
             GameM.Instance.totCoin++;
             other.gameObject.SetActive(false);
             UIS.Instance.updateCoin();
@@ -57,38 +112,77 @@ public class CharaS : MonoBehaviour
         else if (other.gameObject.CompareTag("powerup"))
         {
 
+            other.gameObject.SetActive(false);
         }
     }
 
     IEnumerator TimerDizzy()
     {
+        //fx
+        hitFx.time = 0f;
+        hitFx.Play();
+        dizzyFx.time = 0f;
+        dizzyFx.Play();
+
         anim.SetTrigger("hit");
         rb.AddForce(new Vector2(0f, 400f));
-        float speedTemp = moveSpeed;
-        moveSpeed = 20f;
+
+        float speedTemp = GameM.Instance.moveSpeed;
+        GameM.Instance.moveSpeed *= 0.8f;
+
         yield return new WaitForSeconds(0.5f);
+
         anim.SetTrigger("run");
-        moveSpeed = speedTemp;
+        GameM.Instance.moveSpeed = speedTemp;
+
         yield return new WaitForSeconds(2.5f);
         status = CharStatus.FIT;
+
     }
 
     IEnumerator TimerDie()
     {
         anim.SetTrigger("hit");
         rb.AddForce(new Vector2(0f, 400f));
-        moveSpeed = 0f;
+        GameM.Instance.moveSpeed = 0f;
         GameM.Instance.isEnd = true;
+
         yield return new WaitForSeconds(0.5f);
+
         rb.velocity = Vector2.zero;
-        rb.simulated = false;
+        //rb.simulated = false;
         GameM.Instance.GameOver();
     }
 
-    // Update is called once per frame
-    void Update()
+    #region controller
+    public void OnEndDragDelegate(PointerEventData data)
     {
+        if (!GameM.Instance.isStart)
+        {
+            return;
+        }
+        if (GameM.Instance.isEnd)
+        {
+            return;
+        }
+        //Debug.Log("delta: "+data.delta.y);
+        //Debug.Log("isDrag: " + data.dragging);
+        if (data.delta.y < 0)
+        {
+            if (!isGrounded)
+            {
+                return;
+            }
+            //slide
+            DoSlide.Invoke();
+        }
+        else if (data.delta.y > 0)
+        {
+            //jump
+            Dojump.Invoke();
+        }
     }
+    #endregion
 
     private void FixedUpdate()
     {
@@ -116,7 +210,7 @@ public class CharaS : MonoBehaviour
 
     private void Move()
     {
-        Vector3 targetVelocity = new Vector2((movementX * moveSpeed * Time.fixedDeltaTime) * 10f, rb.velocity.y);
+        Vector3 targetVelocity = new Vector2((movementX * GameM.Instance.moveSpeed * Time.fixedDeltaTime) * 10f, rb.velocity.y);
 
         rb.velocity = Vector3.SmoothDamp(rb.velocity, targetVelocity, ref m_Velocity, 0.05f);
     }
@@ -135,10 +229,11 @@ public class CharaS : MonoBehaviour
                 isGrounded = true;
                 if (!wasGrounded)
                 {
+                    changeCollSize(0);
                 }
                 else
                 {
-                    if (anim.GetCurrentAnimatorClipInfo(0)[0].clip.name != "HeroAnim_run")
+                    if (anim.GetCurrentAnimatorClipInfo(0)[0].clip.name != "HeroAnim_run" && !isSlide)
                     {
                         anim.SetTrigger("run");
                     }
