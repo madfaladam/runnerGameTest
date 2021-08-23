@@ -22,6 +22,8 @@ public class GameM : MonoBehaviour
     public float moveSpeed = 5f;
     [SerializeField] float nextSpeed = 0;
     [Space]
+    public bool showPowerUp = false;
+    [Space]
     public int totCoin = 0;
     public bool isStart = false;
     public bool isPause = false;
@@ -67,6 +69,7 @@ public class GameM : MonoBehaviour
             return;
         }
         checkSpeedLevel();
+        checkShowPowerUp();
         checkParallaxBg();
     }
 
@@ -77,6 +80,13 @@ public class GameM : MonoBehaviour
         {
             moveSpeed++;
             nextSpeed++;
+        }
+    }
+    private void checkShowPowerUp()
+    {
+        if (Mathf.Round(distance) % 30 == 0 && !showPowerUp)
+        {
+            showPowerUp = true;
         }
     }
 

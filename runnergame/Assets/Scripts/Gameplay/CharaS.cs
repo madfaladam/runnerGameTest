@@ -22,8 +22,11 @@ public class CharaS : MonoBehaviour
     [Header("[ move ]")]
     [SerializeField] Transform groundCheck;
     [SerializeField] private LayerMask groundLayerMask;
+    [Header("[ var ]")]
     public bool isGrounded;
     public bool isSlide = false;
+    bool isImmune = false;
+
     Vector3 m_Velocity = Vector3.zero;
     float movementX = 1f;
 
@@ -37,6 +40,12 @@ public class CharaS : MonoBehaviour
     [Header("[ fx ]")]
     [SerializeField] ParticleSystem dizzyFx;
     [SerializeField] ParticleSystem hitFx;
+    [SerializeField] ParticleSystem shieldFx;
+
+
+    Coroutine dizzyCoroutine;
+    Coroutine dieCoroutine;
+    Coroutine puShieldCoroutine;
 
     // Start is called before the first frame update
     void Start()
@@ -80,6 +89,10 @@ public class CharaS : MonoBehaviour
         }
         else if (other.gameObject.CompareTag("obstacle"))
         {
+            if (isImmune)
+            {
+                return;
+            }
             //sound
             hitSfx.Play();
 
@@ -88,31 +101,31 @@ public class CharaS : MonoBehaviour
             if (status == CharStatus.FIT)
             {
                 status = CharStatus.DIZZY;
-                StartCoroutine(TimerDizzy());
+                dizzyCoroutine = StartCoroutine(TimerDizzy());
             }
             else if (status == CharStatus.DIZZY)
             {
-                StopAllCoroutines();
+                StopCoroutine(dizzyCoroutine);
                 status = CharStatus.DIE;
-                StartCoroutine(TimerDie());
+                dieCoroutine = StartCoroutine(TimerDie());
             }
             other.gameObject.SetActive(false);
             GameM.Instance.CameraShake();
         }
         else if (other.gameObject.CompareTag("coin"))
         {
-            //fx
-            hitFx.time = 0f;
-            hitFx.Play();
-
             GameM.Instance.totCoin++;
-            other.gameObject.SetActive(false);
-            UIS.Instance.updateCoin();
+            CoinS coinS = other.GetComponent<CoinS>();
+            coinS.GetHit();
         }
         else if (other.gameObject.CompareTag("powerup"))
         {
-
-            other.gameObject.SetActive(false);
+            PowerUpS pu = other.GetComponent<PowerUpS>();
+            pu.GetHit();
+            if (pu.powerType == PowerType.SHIELD)
+            {
+                puShieldCoroutine = StartCoroutine(TimerShield());
+            }
         }
     }
 
@@ -154,6 +167,22 @@ public class CharaS : MonoBehaviour
         GameM.Instance.GameOver();
     }
 
+    IEnumerator TimerShield()
+    {
+        //fx
+        shieldFx.time = 0f;
+        shieldFx.Play();
+
+        isImmune = true;
+
+        yield return new WaitForSeconds(3f);
+
+        isImmune = false;
+        shieldFx.Stop();
+
+        GameM.Instance.showPowerUp = false;
+
+    }
     #region controller
     public void OnEndDragDelegate(PointerEventData data)
     {
@@ -183,6 +212,25 @@ public class CharaS : MonoBehaviour
         }
     }
     #endregion
+    private void Update()
+    {
+#if UNITY_EDITOR
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            if (!isGrounded)
+            {
+                return;
+            }
+            //slide
+            DoSlide.Invoke();
+        }
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            //jump
+            Dojump.Invoke();
+        }
+#endif
+    }
 
     private void FixedUpdate()
     {
