@@ -4,7 +4,7 @@ using UnityEngine;
 
 public enum PowerType
 {
-    DASH, SHIELD
+    SHIELD, DASH
 }
 public class PowerUpS : MonoBehaviour
 {

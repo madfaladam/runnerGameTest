@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using DG.Tweening;
 
 public enum CharStatus
 {
@@ -23,6 +20,7 @@ public class CharaS : MonoBehaviour
     [SerializeField] Transform groundCheck;
     [SerializeField] private LayerMask groundLayerMask;
     [Header("[ var ]")]
+    PowerType powerType;
     public bool isGrounded;
     public bool isSlide = false;
     bool isImmune = false;
@@ -39,9 +37,8 @@ public class CharaS : MonoBehaviour
     [SerializeField] AudioSource hitSfx;
     [Header("[ fx ]")]
     [SerializeField] ParticleSystem dizzyFx;
-    [SerializeField] ParticleSystem hitFx;
     [SerializeField] ParticleSystem shieldFx;
-
+    [SerializeField] Animator dashFx;
 
     Coroutine dizzyCoroutine;
     Coroutine dieCoroutine;
@@ -97,19 +94,20 @@ public class CharaS : MonoBehaviour
             hitSfx.Play();
 
             Debug.Log("getHit by " + other.gameObject.name);
+            ObtacleS obtacleS = other.GetComponent<ObtacleS>();
+            obtacleS.GetHit();
 
             if (status == CharStatus.FIT)
             {
-                status = CharStatus.DIZZY;
                 dizzyCoroutine = StartCoroutine(TimerDizzy());
             }
             else if (status == CharStatus.DIZZY)
             {
                 StopCoroutine(dizzyCoroutine);
-                status = CharStatus.DIE;
+
                 dieCoroutine = StartCoroutine(TimerDie());
             }
-            other.gameObject.SetActive(false);
+
             GameM.Instance.CameraShake();
         }
         else if (other.gameObject.CompareTag("coin"))
@@ -122,40 +120,61 @@ public class CharaS : MonoBehaviour
         {
             PowerUpS pu = other.GetComponent<PowerUpS>();
             pu.GetHit();
+
+            powerType = pu.powerType;
             if (pu.powerType == PowerType.SHIELD)
             {
                 puShieldCoroutine = StartCoroutine(TimerShield());
             }
+            else if (pu.powerType == PowerType.DASH)
+            {
+                puShieldCoroutine = StartCoroutine(TimerDash());
+            }
         }
     }
 
+    #region getHit
     IEnumerator TimerDizzy()
     {
         //fx
-        hitFx.time = 0f;
-        hitFx.Play();
         dizzyFx.time = 0f;
         dizzyFx.Play();
+
+        status = CharStatus.DIZZY;
 
         anim.SetTrigger("hit");
         rb.AddForce(new Vector2(0f, 400f));
 
-        float speedTemp = GameM.Instance.moveSpeed;
+        //float speedTemp = GameM.Instance.moveSpeed;
         GameM.Instance.moveSpeed *= 0.8f;
 
         yield return new WaitForSeconds(0.5f);
 
+        while (GameM.Instance.isPause)
+        {
+            yield return null;
+        }
+
         anim.SetTrigger("run");
-        GameM.Instance.moveSpeed = speedTemp;
+        //GameM.Instance.moveSpeed = speedTemp;
 
         yield return new WaitForSeconds(2.5f);
+
+        while (GameM.Instance.isPause)
+        {
+            yield return null;
+        }
+
         status = CharStatus.FIT;
 
     }
 
     IEnumerator TimerDie()
     {
+        status = CharStatus.DIE;
+
         anim.SetTrigger("hit");
+
         rb.AddForce(new Vector2(0f, 400f));
         GameM.Instance.moveSpeed = 0f;
         GameM.Instance.isEnd = true;
@@ -166,9 +185,14 @@ public class CharaS : MonoBehaviour
         //rb.simulated = false;
         GameM.Instance.GameOver();
     }
+    #endregion
 
+    #region powerupIE
     IEnumerator TimerShield()
     {
+        UIS.Instance.ShowPowerUp(powerType);
+        yield return new WaitForSeconds(1f);
+        UIS.Instance.HidePowerUp();
         //fx
         shieldFx.time = 0f;
         shieldFx.Play();
@@ -177,20 +201,49 @@ public class CharaS : MonoBehaviour
 
         yield return new WaitForSeconds(3f);
 
+        while (GameM.Instance.isPause)
+        {
+            yield return null;
+        }
+
         isImmune = false;
         shieldFx.Stop();
 
         GameM.Instance.showPowerUp = false;
-
     }
+    IEnumerator TimerDash()
+    {
+        UIS.Instance.ShowPowerUp(powerType);
+        yield return new WaitForSeconds(1f);
+        UIS.Instance.HidePowerUp();
+        //fx
+        dashFx.SetTrigger("play");
+        dashFx.GetComponent<AudioSource>().PlayDelayed(0.2f);
+
+        isImmune = true;
+        yield return new WaitForSeconds(0.2f);
+
+        float speedTemp = GameM.Instance.moveSpeed;
+        GameM.Instance.moveSpeed *= 2f;
+        yield return new WaitForSeconds(3f);
+
+        while (GameM.Instance.isPause)
+        {
+            yield return null;
+        }
+        GameM.Instance.moveSpeed = speedTemp;
+
+        isImmune = false;
+        dashFx.SetTrigger("idle");
+
+        GameM.Instance.showPowerUp = false;
+    }
+    #endregion
+
     #region controller
     public void OnEndDragDelegate(PointerEventData data)
     {
-        if (!GameM.Instance.isStart)
-        {
-            return;
-        }
-        if (GameM.Instance.isEnd)
+        if (!GameM.Instance.isStart || GameM.Instance.isEnd || GameM.Instance.isPause)
         {
             return;
         }
@@ -212,9 +265,14 @@ public class CharaS : MonoBehaviour
         }
     }
     #endregion
+
     private void Update()
     {
 #if UNITY_EDITOR
+        if (!GameM.Instance.isStart || GameM.Instance.isEnd || GameM.Instance.isPause)
+        {
+            return;
+        }
         if (Input.GetKeyDown(KeyCode.S))
         {
             if (!isGrounded)

@@ -76,7 +76,7 @@ public class GameM : MonoBehaviour
     private void checkSpeedLevel()
     {
         distance ++;
-        if (Mathf.Round(distance) % 20 == 0 && moveSpeed < nextSpeed)
+        if (Mathf.Round(distance) % 25 == 0 && moveSpeed < nextSpeed)
         {
             moveSpeed++;
             nextSpeed++;

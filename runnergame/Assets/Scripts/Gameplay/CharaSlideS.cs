@@ -38,6 +38,11 @@ public class CharaSlideS : MonoBehaviour
 
         yield return new WaitForSeconds(1f);
 
+        while(GameM.Instance.isPause)
+        {
+            yield return null;
+        }
+        Debug.Log("pause: " + GameM.Instance.isPause);
         charaS.changeCollSize(0); 
 
         charaS.anim.SetTrigger("run");
