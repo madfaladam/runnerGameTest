@@ -39,6 +39,8 @@ public class CharaS : MonoBehaviour
     [SerializeField] ParticleSystem dizzyFx;
     [SerializeField] ParticleSystem shieldFx;
     [SerializeField] Animator dashFx;
+    [Space]
+    [SerializeField] GameObject magnetPU;
 
     Coroutine dizzyCoroutine;
     Coroutine dieCoroutine;
@@ -95,7 +97,15 @@ public class CharaS : MonoBehaviour
 
             Debug.Log("getHit by " + other.gameObject.name);
             ObtacleS obtacleS = other.GetComponent<ObtacleS>();
-            obtacleS.GetHit();
+            if (obtacleS != null)
+            {
+                obtacleS.GetHit();
+            }
+            else
+            {
+                ObstacleProjectileS obtacleS2 = other.GetComponent<ObstacleProjectileS>();
+                obtacleS2.GetHit();
+            }
 
             if (status == CharStatus.FIT)
             {
@@ -107,13 +117,19 @@ public class CharaS : MonoBehaviour
 
                 dieCoroutine = StartCoroutine(TimerDie());
             }
-
-            GameM.Instance.CameraShake();
+            //fx
+            GameM.Instance.CameraShake(1f);
         }
         else if (other.gameObject.CompareTag("coin"))
         {
             GameM.Instance.totCoin++;
             CoinS coinS = other.GetComponent<CoinS>();
+            coinS.GetHit();
+        }
+        else if (other.gameObject.CompareTag("coinD"))
+        {
+            GameM.Instance.totCoin++;
+            CoinMoveS coinS = other.GetComponent<CoinMoveS>();
             coinS.GetHit();
         }
         else if (other.gameObject.CompareTag("powerup"))
@@ -129,6 +145,10 @@ public class CharaS : MonoBehaviour
             else if (pu.powerType == PowerType.DASH)
             {
                 puShieldCoroutine = StartCoroutine(TimerDash());
+            }
+            else if (pu.powerType == PowerType.MAGNET)
+            {
+                puShieldCoroutine = StartCoroutine(TimerMagnet());
             }
         }
     }
@@ -210,6 +230,8 @@ public class CharaS : MonoBehaviour
         shieldFx.Stop();
 
         GameM.Instance.showPowerUp = false;
+
+        GameM.Instance.currPowerShow--;
     }
     IEnumerator TimerDash()
     {
@@ -225,6 +247,9 @@ public class CharaS : MonoBehaviour
 
         float speedTemp = GameM.Instance.moveSpeed;
         GameM.Instance.moveSpeed *= 2f;
+        //fx
+        GameM.Instance.CameraShake(3f);
+
         yield return new WaitForSeconds(3f);
 
         while (GameM.Instance.isPause)
@@ -237,6 +262,25 @@ public class CharaS : MonoBehaviour
         dashFx.SetTrigger("idle");
 
         GameM.Instance.showPowerUp = false;
+
+        GameM.Instance.currPowerShow--;
+    }
+
+    IEnumerator TimerMagnet()
+    {
+        UIS.Instance.ShowPowerUp(powerType);
+        yield return new WaitForSeconds(1f);
+        UIS.Instance.HidePowerUp();
+
+        magnetPU.SetActive(true);
+
+        yield return new WaitForSeconds(3f);
+
+        while (GameM.Instance.isPause)
+        {
+            yield return null;
+        }
+        magnetPU.SetActive(false);
     }
     #endregion
 
@@ -292,11 +336,7 @@ public class CharaS : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (GameM.Instance.isEnd)
-        {
-            return;
-        }
-        if (GameM.Instance.isPause)
+        if (GameM.Instance.isPause || GameM.Instance.isEnd)
         {
             movementX = 0f;
             rb.velocity = Vector2.zero;

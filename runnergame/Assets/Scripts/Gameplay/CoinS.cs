@@ -31,6 +31,17 @@ public class CoinS : MonoBehaviour
         graph.SetActive(false);
     }
 
+    public void GetHitByCoinDetector(Transform targetTrans)
+    {
+        coll2D.enabled = false;
+        graph.SetActive(false);
+        //get pool
+        GameObject coin = PoolCoinS.Instance.GetCoin();
+        coin.SetActive(true);
+        coin.transform.position = transform.position;
+        CoinMoveS coinMoveS = coin.GetComponent<CoinMoveS>();
+        coinMoveS.target = targetTrans;
+    }
     private void OnEnable()
     {
         if (defaultPos != Vector2.zero)

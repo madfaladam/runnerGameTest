@@ -1,24 +1,19 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
-public enum PowerType
+public class CoinMoveS : MonoBehaviour
 {
-    SHIELD, DASH, MAGNET
-}
-public class PowerUpS : MonoBehaviour
-{
-    public PowerType powerType;
-
-    [SerializeField] Vector2 defaultPos;
+    public Transform target;
 
     AudioSource sfx;
     Collider2D coll2D;
     GameObject graph;
     ParticleSystem hitFx;
-
     // Start is called before the first frame update
     void Start()
     {
-        defaultPos = transform.localPosition;
         graph = transform.GetChild(0).gameObject;
         sfx = GetComponent<AudioSource>();
         coll2D = GetComponent<Collider2D>();
@@ -31,21 +26,22 @@ public class PowerUpS : MonoBehaviour
         hitFx.time = 0f;
         hitFx.Play();
 
+        UIS.Instance.updateCoin();
+
         coll2D.enabled = false;
         graph.SetActive(false);
+        StartCoroutine(TimerToPool());
+    }
+
+    IEnumerator TimerToPool()
+    {
+        yield return new WaitForSeconds(1f);
+
+        PoolCoinS.Instance.BackCoinToPool(gameObject);
     }
 
     private void OnEnable()
     {
-        if (!GameM.Instance.showPowerUp)
-        {
-            gameObject.SetActive(false);
-            return;
-        }
-        if (defaultPos != Vector2.zero)
-        {
-            transform.localPosition = defaultPos;
-        }
         if (coll2D != null)
         {
             coll2D.enabled = true;
@@ -54,5 +50,14 @@ public class PowerUpS : MonoBehaviour
         {
             graph.SetActive(true);
         }
+    }
+    private void Update()
+    {
+        if (target == null)
+        {
+            return;
+        }
+
+        transform.position = Vector3.MoveTowards(transform.position, target.position, 30f * Time.deltaTime);
     }
 }

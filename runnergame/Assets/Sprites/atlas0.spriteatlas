@@ -1,0 +1,159 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: atlas0
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings: []
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 1
+      enableTightPacking: 0
+    variantMultiplier: 1
+    packables:
+    - {fileID: 2800000, guid: 08a4d43c4ecc24ae7bce26b99151fa0b, type: 3}
+    - {fileID: 2800000, guid: 83d8413074b20403f973ef267d77d15a, type: 3}
+    - {fileID: 2800000, guid: 9a918558393a44bb882681221508c61c, type: 3}
+    - {fileID: 2800000, guid: 0df2b8b7f3e9b46cf9b11f6b0c8800b5, type: 3}
+    - {fileID: 2800000, guid: 46d1c8bdf691f42f78fa1ca9cc018e79, type: 3}
+    - {fileID: 2800000, guid: bcb208bf3196044908af69a76c49cb44, type: 3}
+    - {fileID: 2800000, guid: be6bef3faf9d7478eb536469de19414a, type: 3}
+    - {fileID: 2800000, guid: 1e37c5815feca4ad5816068f5ff642b5, type: 3}
+    - {fileID: 2800000, guid: 9904d932ad0de4ef9a62a4d7f885628e, type: 3}
+    - {fileID: 2800000, guid: ddd5fbe5b75a24a8e9a92c9a05fb5dbf, type: 3}
+    - {fileID: 102900000, guid: 49795848afbeb40dbbba573cdf82dc6d, type: 3}
+    - {fileID: 102900000, guid: 4feea0ba173f444ce83f56eb309a9d5a, type: 3}
+    - {fileID: 2800000, guid: 25bfbb1ad57104f8e9a5914c42acdbaa, type: 3}
+    - {fileID: 2800000, guid: e8d360d977c5b470b91ea0137a7b518c, type: 3}
+    - {fileID: 2800000, guid: b9a2e95b44c134659b749c3a6de8c849, type: 3}
+    - {fileID: 2800000, guid: 204fadace6d8a4fc8b96ad09fa05894d, type: 3}
+    - {fileID: 2800000, guid: 7eb4600ac77df45178692e34e020768b, type: 3}
+    - {fileID: 2800000, guid: bb5d5f0e3adae426386f1a52ee43c143, type: 3}
+    - {fileID: 102900000, guid: 1b673c82a61a447d0893d39a0d123657, type: 3}
+    - {fileID: 102900000, guid: da0eb6821dfe6424ca5f52ae102b6411, type: 3}
+    totalSpriteSurfaceArea: 7532439
+    bindAsDefault: 1
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: a94e922091feb499d876b2bd7468de61, type: 3}
+  - {fileID: 21300000, guid: 83d8413074b20403f973ef267d77d15a, type: 3}
+  - {fileID: 21300000, guid: 7bcdb270d27684061994562f066d7f32, type: 3}
+  - {fileID: 21300000, guid: e4a4b7b06e84e412b8b23906f47ae7fc, type: 3}
+  - {fileID: 21300000, guid: 04198461ea0cc49a4a28c80e2d07357e, type: 3}
+  - {fileID: 21300000, guid: 1e37c5815feca4ad5816068f5ff642b5, type: 3}
+  - {fileID: 21300000, guid: 76877491158d940578c8efc3e03d6a0f, type: 3}
+  - {fileID: 21300000, guid: dd4c7bb1706bc495e8176e68f986144a, type: 3}
+  - {fileID: 21300000, guid: 9904d932ad0de4ef9a62a4d7f885628e, type: 3}
+  - {fileID: 21300000, guid: c59cadb22f5d84c19ad9677d07fd13be, type: 3}
+  - {fileID: 21300000, guid: cbbdbcc208754429e96d6d0017784cc4, type: 3}
+  - {fileID: 21300000, guid: e2fad1e24da9f43cb81b9020b26e299b, type: 3}
+  - {fileID: 21300000, guid: 29d70ef31fef24ad89d3ab0f15cf7979, type: 3}
+  - {fileID: 21300000, guid: 11620224591b74f089801611d319f4d1, type: 3}
+  - {fileID: 21300000, guid: b767317451c7445fd8e722d873a4526c, type: 3}
+  - {fileID: 21300000, guid: d03d9b84ced19484d93bcba4e5315710, type: 3}
+  - {fileID: 21300000, guid: 79e34194f76a04d32bd8c01cdae6efcb, type: 3}
+  - {fileID: 21300000, guid: b121e8b441d534a9889abd9012ca11ce, type: 3}
+  - {fileID: 21300000, guid: caa3b6e45497a4865adc83ec15279a17, type: 3}
+  - {fileID: 21300000, guid: 0fa09d55e620244eda8704cdced686fc, type: 3}
+  - {fileID: 21300000, guid: 0cd67795f73d04fbba5c1ab1c603af78, type: 3}
+  - {fileID: 21300000, guid: c8cfeac5ef79545e4af31f937e8c6ff3, type: 3}
+  - {fileID: 21300000, guid: ddd5fbe5b75a24a8e9a92c9a05fb5dbf, type: 3}
+  - {fileID: 21300000, guid: 93bb2666d7c6b45ad9d844235e969dc4, type: 3}
+  - {fileID: 21300000, guid: 244b30a677a3449f198f3016bc5e2856, type: 3}
+  - {fileID: 21300000, guid: 94a1348795de148858d63b6844e71fe9, type: 3}
+  - {fileID: 21300000, guid: 0df2b8b7f3e9b46cf9b11f6b0c8800b5, type: 3}
+  - {fileID: 21300000, guid: 4be4b42881a4e4163b65d48939c1a6f6, type: 3}
+  - {fileID: 21300000, guid: 9a918558393a44bb882681221508c61c, type: 3}
+  - {fileID: 21300000, guid: e8d360d977c5b470b91ea0137a7b518c, type: 3}
+  - {fileID: 21300000, guid: 7eb4600ac77df45178692e34e020768b, type: 3}
+  - {fileID: 21300000, guid: d420900a821c7423eb89fdbb003b971d, type: 3}
+  - {fileID: 21300000, guid: 4f0ff71a60ffb4bb09f5931b09556258, type: 3}
+  - {fileID: 21300000, guid: 25bfbb1ad57104f8e9a5914c42acdbaa, type: 3}
+  - {fileID: 21300000, guid: ecde7d1b0ffa04ea0a5feebccb3054c6, type: 3}
+  - {fileID: 21300000, guid: b9a2e95b44c134659b749c3a6de8c849, type: 3}
+  - {fileID: 21300000, guid: 08a4d43c4ecc24ae7bce26b99151fa0b, type: 3}
+  - {fileID: 21300000, guid: 4c094c9c26dff47fb9946040fe6f7b08, type: 3}
+  - {fileID: 21300000, guid: 204fadace6d8a4fc8b96ad09fa05894d, type: 3}
+  - {fileID: 21300000, guid: c854568d5451140a4b3ce552b5508a20, type: 3}
+  - {fileID: 21300000, guid: 6ac73d8dfd97e4cd585d18ffd2508539, type: 3}
+  - {fileID: 21300000, guid: 46d1c8bdf691f42f78fa1ca9cc018e79, type: 3}
+  - {fileID: 21300000, guid: fbf03c0e5a0464a7a84213e829882c0d, type: 3}
+  - {fileID: 21300000, guid: bb5d5f0e3adae426386f1a52ee43c143, type: 3}
+  - {fileID: 21300000, guid: a93eb32e2525346769d28f818cad09c3, type: 3}
+  - {fileID: 21300000, guid: 578fe5beec30245729089d1087832302, type: 3}
+  - {fileID: 21300000, guid: 5a0339ce46b8b461a9be1d3de2dd1dca, type: 3}
+  - {fileID: 21300000, guid: be6bef3faf9d7478eb536469de19414a, type: 3}
+  - {fileID: 21300000, guid: bcb208bf3196044908af69a76c49cb44, type: 3}
+  - {fileID: 21300000, guid: 0ebda9cf3990d409fa7fe22131eb8552, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - rudal0003
+  - ketupatI
+  - Warning0008
+  - rudal0001
+  - bg2
+  - barrel0
+  - Warning0007
+  - ground1
+  - Barrel1
+  - homeIc
+  - bgt
+  - bg1
+  - Warning0006
+  - Warning0002
+  - btnblk0001
+  - cloud
+  - Warning0004
+  - settingIc
+  - rudal0005
+  - btnblkB0001
+  - Warning0005
+  - bg0
+  - bamboo
+  - ground0
+  - rudal0002
+  - rudal0008
+  - tunnel
+  - rudal0006
+  - schyte
+  - frameImg1
+  - resultT
+  - replayIc
+  - Warning0009
+  - frameImg
+  - btnblk0003
+  - htpT
+  - coin
+  - resumeIc
+  - logoImg
+  - Warning0003
+  - btnblkB0003
+  - BearTrap
+  - closeIc
+  - settingT
+  - Warning0001
+  - rudal0007
+  - rudal0004
+  - tusk
+  - Rock
+  - groundedge
+  m_Tag: atlas0
+  m_IsVariant: 0

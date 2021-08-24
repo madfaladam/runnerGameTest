@@ -16,13 +16,16 @@ public class GameM : MonoBehaviour
     [SerializeField] GameObject htpCanvas;
     [SerializeField] GameObject settingCanvas;
     [SerializeField] GameObject resultCanvas;
-    [Header("[ obj ]")]
+    [Header("[ pool ]")]
     [SerializeField] PoolItemObsS poolItemObs;
+    [Header("[ obstacle projectile ]")]
+    public int currObsProjectile = 0;
+    [Header("[ powerup ]")]
+    public bool showPowerUp = false;
+    public int currPowerShow = 0;
     [Header("[ var ]")]
     public float moveSpeed = 5f;
     [SerializeField] float nextSpeed = 0;
-    [Space]
-    public bool showPowerUp = false;
     [Space]
     public int totCoin = 0;
     public bool isStart = false;
@@ -64,19 +67,21 @@ public class GameM : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (isPause || isEnd)
-        {
-            return;
-        }
         checkSpeedLevel();
         checkShowPowerUp();
+        checkShowObtacleProjectile();
         checkParallaxBg();
     }
 
     private void checkSpeedLevel()
     {
+        if (!isStart || isPause || isEnd)
+        {
+            return;
+        }
+
         distance ++;
-        if (Mathf.Round(distance) % 25 == 0 && moveSpeed < nextSpeed)
+        if (distance > 0 && Mathf.Round(distance) % 25 == 0 && moveSpeed < nextSpeed)
         {
             moveSpeed++;
             nextSpeed++;
@@ -84,9 +89,18 @@ public class GameM : MonoBehaviour
     }
     private void checkShowPowerUp()
     {
-        if (Mathf.Round(distance) % 30 == 0 && !showPowerUp)
+        if (distance > 0 && Mathf.Round(distance) % 30 == 0 && !showPowerUp)
         {
+            Debug.Log("showPowerUp: " + showPowerUp);
             showPowerUp = true;
+        }
+    }
+    private void checkShowObtacleProjectile()
+    {
+        if (distance > 0 && Mathf.Round(distance) % 250 == 0 && currObsProjectile < 1)
+        {
+            currObsProjectile++;
+            UIS.Instance.ShowWarning();
         }
     }
 
@@ -141,13 +155,30 @@ public class GameM : MonoBehaviour
         Transform itemObs = poolItemObs.GetItemObs().transform;
         itemObs.SetParent(groundTrans);
         itemObs.localPosition = Vector3.zero;
+
+        //check powerup
+        for (int i = 0; i < itemObs.childCount; i++)
+        {
+            if (itemObs.GetChild(i).CompareTag("powerup"))
+            {
+                if (showPowerUp && currPowerShow < 1)
+                {
+                    itemObs.GetChild(i).gameObject.SetActive(true);
+                    currPowerShow++;
+                }
+                else
+                {
+                    itemObs.GetChild(i).gameObject.SetActive(false);
+                }
+            }
+        }
     }
 
-    public void CameraShake()
+    public void CameraShake(float v)
     {
         CinemachineBasicMultiChannelPerlin cinemachineBasicMultiChannelPerlin = vcam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
         cinemachineBasicMultiChannelPerlin.m_AmplitudeGain = 1f;
-        DOTween.To(() => cinemachineBasicMultiChannelPerlin.m_AmplitudeGain, x => cinemachineBasicMultiChannelPerlin.m_AmplitudeGain = x, 0f, 1f);
+        DOTween.To(() => cinemachineBasicMultiChannelPerlin.m_AmplitudeGain, x => cinemachineBasicMultiChannelPerlin.m_AmplitudeGain = x, 0f, v);
 
     }
 

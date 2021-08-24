@@ -13,6 +13,8 @@ public class UIS : MonoBehaviour
     [SerializeField] Image powerUpImg;
     [SerializeField] TMP_Text powerUpT;
     [SerializeField] Sprite[] powerUpSp;
+    [Header("[ obstacle projectile]")]
+    [SerializeField] GameObject warningImg;
     [Header("[ ui ]")]
     [SerializeField] Button settingBtn;
     [SerializeField] TMP_Text coinT;
@@ -32,6 +34,7 @@ public class UIS : MonoBehaviour
         settingBtn.onClick.AddListener(ClickSetting);
     }
 
+    #region Coin
     public void updateCoin()
     {
         coinTemp++;
@@ -41,6 +44,7 @@ public class UIS : MonoBehaviour
         coinT.transform.localScale = Vector3.one;
         coinT.transform.DOPunchScale(Vector3.one * 0.9f, 0.3f, 2, 0.2f);
     }
+    #endregion
 
     #region powerup
     public void ShowPowerUp(PowerType powerType)
@@ -66,6 +70,18 @@ public class UIS : MonoBehaviour
         SoundS.Instance.PlaySfx(0);
 
         GameM.Instance.ShowSetting(true);
+    }
+    #endregion
+
+    #region obstacle
+    public void ShowWarning()
+    {
+        warningImg.SetActive(true);
+        warningImg.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, UnityEngine.Random.Range(-500, 0f));
+    }
+    public void HideWarning()
+    {
+        warningImg.SetActive(false);
     }
     #endregion
 }

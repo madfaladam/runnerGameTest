@@ -42,7 +42,7 @@ public class CharaSlideS : MonoBehaviour
         {
             yield return null;
         }
-        Debug.Log("pause: " + GameM.Instance.isPause);
+        //Debug.Log("pause: " + GameM.Instance.isPause);
         charaS.changeCollSize(0); 
 
         charaS.anim.SetTrigger("run");
